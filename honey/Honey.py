@@ -13,8 +13,8 @@ from telegram.ext import (
 )
 
 
-BOT_TOKEN = "8216114774:AAHvmxCht79fVCFMnM14WqO2FOkBF5QxLx4"
-ADMIN_ID = 640876100          
+BOT_TOKEN = "--------"
+ADMIN_ID = ---------          
 
 VOTE_LIMIT = 7
 MAX_SAMPLES = 60
@@ -220,3 +220,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
