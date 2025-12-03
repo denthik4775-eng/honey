@@ -12,22 +12,18 @@ from telegram.ext import (
     filters,
 )
 
-
-BOT_TOKEN = "--------"
-ADMIN_ID = ---------          
+BOT_TOKEN = "8216114774:AAHvmxCht79fVCFMnM14WqO2FOkBF5QxLx4"
+ADMIN_ID = 640876100         
 
 VOTE_LIMIT = 7
 MAX_SAMPLES = 60
 RESULTS_FILE = "honey_votes.json"
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-votes = {i: 0 for i in range(1, MAX_SAMPLES + 1)}   
-user_votes = {}                                    
-
+votes = {i: 0 for i in range(1, MAX_SAMPLES + 1)}  
+user_votes = {}                                     
 
 def load_votes():
     """Загрузка голосов из файла при старте бота."""
@@ -43,7 +39,6 @@ def load_votes():
         except Exception as e:
             logger.error(f"Ошибка загрузки файла голосов: {e}")
 
-
 def save_votes():
     """Сохранение голосов в файл после каждого голосования."""
     try:
@@ -56,14 +51,12 @@ def save_votes():
     except Exception as e:
         logger.error(f"Ошибка сохранения файла голосов: {e}")
 
-
 def make_main_keyboard():
     keyboard = [
         [KeyboardButton("📊 Результаты"), KeyboardButton("ℹ️ Помощь")],
-        [KeyboardButton("🔄 Меню"), KeyboardButton("📈 Статистика")],
+        [KeyboardButton("🔄 Меню")],
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     load_votes()
@@ -83,7 +76,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown",
         reply_markup=make_main_keyboard(),
     )
-
 
 async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Любое текстовое сообщение: выдёргиваем первое число и считаем голос."""
@@ -144,8 +136,8 @@ async def handle_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{beekeeper_info}\n\n"
         "➡️ Можете ввести следующий номер мёда.",
         parse_mode="Markdown",
+        reply_markup=make_main_keyboard(),
     )
-
 
 async def show_results(update: Update, context: ContextTypes.DEFAULT_TYPE):
     load_votes()
@@ -160,8 +152,11 @@ async def show_results(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id == ADMIN_ID:
         text += f"\n👥 Уникальных голосующих: {len(user_votes)}"
 
-    await update.message.reply_text(text, parse_mode="Markdown")
-
+    await update.message.reply_text(
+        text, 
+        parse_mode="Markdown",
+        reply_markup=make_main_keyboard()
+    )
 
 async def admin_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
@@ -178,8 +173,11 @@ async def admin_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text += f"\n👥 Уникальных голосующих: {len(user_votes)}"
 
-    await update.message.reply_text(text, parse_mode="Markdown")
-
+    await update.message.reply_text(
+        text, 
+        parse_mode="Markdown",
+        reply_markup=make_main_keyboard()
+    )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -191,11 +189,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "*Команды:*\n"
         "/start или /menu — главное меню\n"
         "📊 Результаты — ТОП‑5\n"
-        "/stats или 📈 Статистика — полная статистика (только для организатора)",
+        "/stats — полная статистика (только для организатора)",
         parse_mode="Markdown",
         reply_markup=make_main_keyboard(),
     )
-
 
 def main():
     load_votes()
@@ -210,13 +207,11 @@ def main():
     app.add_handler(MessageHandler(filters.Regex(r"^📊 Результаты$"), show_results))
     app.add_handler(MessageHandler(filters.Regex(r"^ℹ️ Помощь$"), help_command))
     app.add_handler(MessageHandler(filters.Regex(r"^🔄 Меню$"), start))
-    app.add_handler(MessageHandler(filters.Regex(r"^📈 Статистика$"), admin_stats))
 
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_number))
 
     print("🍯 Бот конкурса мёда запущен!")
     app.run_polling()
-
 
 if __name__ == "__main__":
     main()
